@@ -1,8 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+import jax.numpy as jnp
+
 # from functools import partial
 import pickle
+
+from IPython import display
+from IPython.display import clear_output
+import time
 
 # Some helper functions
 
@@ -19,9 +25,9 @@ def load_from_disk(L, g, h, fn=""):
     return loaded_data
 
 
-def plot_observables(fn=""):
+def plot_observables(L, g, h, fn=""):
 
-    loaded_data = load_from_disk(fn)
+    loaded_data = load_from_disk(L, g, h, fn)
     
     obs_data = np.array(loaded_data["observables"])
     res_data = np.array(loaded_data["residuals"])
@@ -101,3 +107,14 @@ def initialize_in_X_state(psi, L, sampler):
     gsEquation = jVMC.util.TDVP(sampler, pinvTol=1e-8, rhsPrefactor=1.0, makeReal='real', diagonalShift=10)
 
     ground_state_search(psi, H_init, gsEquation, sampler, numSteps=200)
+
+
+def write_info(t, dt, tdvpErr, linEqRes, obs, tic):
+    clear_output(wait=False)
+    print(">> t = %f\n" % (t))
+    print("   Time step size: dt = %.2e" % (dt))
+    print("   Residuals :               TDVP error = %.2e" % (tdvpErr))
+    print("               Linear equation residual = %.2e" % (linEqRes))
+    print("      Energy : %f +/- %f" % (obs["energy"]["mean"], obs["energy"]["MC_error"]))
+    toc = time.perf_counter()
+    print("== Total time for this step: %fs\n" % (toc - tic))
