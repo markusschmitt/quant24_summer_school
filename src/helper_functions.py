@@ -27,7 +27,7 @@ def load_from_disk(L, g, h, fn=""):
     return loaded_data
 
 
-def plot_observables(L, g, h, fns=""):
+def plot_observables(L, g, h, fns="", tmax=None):
 
     fig, ax = plt.subplots(1,2, figsize=(12,4))
 
@@ -41,7 +41,9 @@ def plot_observables(L, g, h, fns=""):
             fn_exact = "./data/exact_L="+str(L)+"_g="+str(g)+"_h="+str(h)+".txt"
             if os.path.isfile(fn_exact):
                 data_exact = np.loadtxt(fn_exact)
-                ixs = np.where(data_exact[:,0] < obs_data[-1,0])[0]
+                if tmax==None:
+                    tmax = obs_data[-1,0]
+                ixs = np.where(data_exact[:,0] < tmax)[0]
                 ax[0].plot(data_exact[ixs,0], data_exact[ixs,2], c="black", label="exact")
 
         ax[0].plot(obs_data[:,0], obs_data[:,2], label=fn[:-1])
