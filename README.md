@@ -1,4 +1,6 @@
-# quant24_summer_school
+# Quant24 Summer School @ MPI PKS
+
+This is a little tutorial for NQS simulations using the [jVMC][https://www.github.com/markusschmitt/vmc_jax] library.
 
 # Setup
 
