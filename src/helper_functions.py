@@ -10,6 +10,8 @@ from IPython import display
 from IPython.display import clear_output
 import time
 
+import os.path
+
 # Some helper functions
 
 def norm_fun(v, df=lambda x: x):
@@ -25,25 +27,34 @@ def load_from_disk(L, g, h, fn=""):
     return loaded_data
 
 
-def plot_observables(L, g, h, fn=""):
+def plot_observables(L, g, h, fns=""):
 
-    loaded_data = load_from_disk(L, g, h, fn)
-    
-    obs_data = np.array(loaded_data["observables"])
-    res_data = np.array(loaded_data["residuals"])
-    
     fig, ax = plt.subplots(1,2, figsize=(12,4))
+
+    for i,fn in enumerate(fns):
+        loaded_data = load_from_disk(L, g, h, fn)
+
+        obs_data = np.array(loaded_data["observables"])
+        res_data = np.array(loaded_data["residuals"])
+
+        if i==0:
+            fn_exact = "./data/exact_L="+str(L)+"_g="+str(g)+"_h="+str(h)+".txt"
+            if os.path.isfile(fn_exact):
+                data_exact = np.loadtxt(fn_exact)
+                ixs = np.where(data_exact[:,0] < obs_data[-1,0])[0]
+                ax[0].plot(data_exact[ixs,0], data_exact[ixs,2], c="black", label="exact")
+
+        ax[0].plot(obs_data[:,0], obs_data[:,2], label=fn[:-1])
+        ax[0].set_xlabel(r"Time $Jt$")
+        ax[0].set_ylabel(r"Magnetization $\langle \hat X\rangle$")
+        ax[0].legend()
+        ax[1].semilogy(res_data[:,0], res_data[:,1])
+        ax[1].set_xlabel(r"Time $Jt$")
+        ax[1].set_ylabel(r"TDVP error")
     
-    ax[0].plot(obs_data[:,0], obs_data[:,2])
-    ax[0].set_xlabel(r"Time $Jt$")
-    ax[0].set_ylabel(r"Magnetization $\langle \hat X\rangle$")
-    ax[1].semilogy(res_data[:,0], res_data[:,1])
-    ax[1].set_xlabel(r"Time $Jt$")
-    ax[1].set_ylabel(r"TDVP error")
-    
-    plt.tight_layout()
-    
-    
+    plt.tight_layout() 
+   
+ 
 def plot_parameters(fn=""):
     
     param_data = load_from_disk(fn)["parameters"]
